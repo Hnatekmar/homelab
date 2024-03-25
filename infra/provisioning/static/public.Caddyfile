@@ -1,0 +1,27 @@
+# The Caddyfile is an easy way to configure your Caddy web server.
+#
+# Unless the file starts with a global options block, the first
+# uncommented line is always the address of your site.
+#
+# To use your own domain name (with automatic HTTPS), first make
+# sure your domain's A/AAAA DNS records are properly pointed to
+# this machine's public IP, then replace ":80" below with your
+# domain name.
+
+git.hnatekmar.xyz {
+        reverse_proxy cluster-0 cluster-1 cluster-2 cluster-3
+}
+
+garage.hnatekmar.xyz {
+        reverse_proxy cold-storage.private.hnatekmar.xyz:3900
+}
+
+concourse.hnatekmar.xyz {
+        reverse_proxy cluster-0 cluster-1 cluster-2 cluster-3
+}
+mattermost.hnatekmar.xyz {
+        reverse_proxy cluster-0 cluster-1 cluster-2 cluster-3
+}
+
+# Refer to the Caddy docs for more information:
+# https://caddyserver.com/docs/caddyfile
