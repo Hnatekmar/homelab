@@ -1,0 +1,35 @@
+variant: fcos
+version: 1.5.0
+passwd:
+  users:
+    - name: core
+      groups:
+        - docker
+        - sudo
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL8w84A9Qu/2+QM9KzF2kaWsnzO2+eplIpBNoaT5p7Gb martin@fedora
+storage:
+  filesystems:
+    - device: /dev/sda
+      wipe_filesystem: false
+      format: xfs
+      label: root
+systemd:
+  units:
+  - name: gitea-runner.service
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Gitea runner
+      After=network-online.target
+      Wants=network-online.target
+      
+      [Service]
+      TimeoutStartSec=0
+      ExecStartPre=-/bin/podman rm runner
+      ExecStartPre=/bin/podman pull gitea/act_runner:nightly 
+      ExecStart=/usr/bin/docker run --name runner --restart=always -e GITEA_INSTANCE_URL=https://git.hnatekmar.xyz -e GITEA_RUNNER_REGISTRATION_TOKEN=REVOKED -v /var/run/docker.sock:/var/run/docker.sock --name gitea_runner gitea/act_runner:nightly 
+
+      [Install]
+      WantedBy=multi-user.target
+      

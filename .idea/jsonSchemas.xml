@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JsonSchemaMappingsProjectConfiguration">
+    <state>
+      <map>
+        <entry key="Butane Config">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="Butane Config" />
+              <option name="relativePathToSchema" value="https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json" />
+              <option name="applicationDefined" value="true" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="base.butane.yaml" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="server.bu.yaml" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+      </map>
+    </state>
+  </component>
+</project>
