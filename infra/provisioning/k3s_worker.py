@@ -1,6 +1,9 @@
-from pyinfra.operations import server
+from pyinfra import local
+from pyinfra.operations import server, python
 
 import os
+
+local.include("provisioning/utils.py")
 
 url = os.environ["K3S_URL"]
 token = os.environ["K3S_TOKEN"]

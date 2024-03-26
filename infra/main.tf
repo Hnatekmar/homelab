@@ -23,6 +23,11 @@ resource "proxmox_vm_qemu" "kube-master" {
     model = "virtio"
     bridge = "vmbr0"
   }
+  network {
+    model = "virtio"
+    bridge = "vmbr2"
+    mtu = 9000
+  }
   memory = 2096
   cores = 4
   os_type = "cloud-init"
@@ -46,21 +51,27 @@ resource "proxmox_vm_qemu" "kube-master" {
   scsihw = "virtio-scsi-single"
 
   provisioner "local-exec" {
+    # TODO: this is a hack, we need to wait for the master to be up and running before we can provision the worker. Need to actively check for ssh port
     command = "sleep 25 && pyinfra --ssh-user root ${self.ssh_host} ./provisioning/k3s_master.py"
   }
 }
 
 resource "proxmox_vm_qemu" "kube-worker" {
-#  for_each = toset(["pve-0", "pve-1"])
-  for_each = proxmox_vm_qemu.kube-master
+  for_each = toset(["pve-0", "pve-1"])
+#  for_each =
   agent = 1
-  target_node = "pve-0"
+  target_node = each.value
   name = "k8s-worker-${each.key}"
   desc = "testing terraform"
   clone = "fedora-server-base"
   network {
     model = "virtio"
     bridge = "vmbr0"
+  }
+  network {
+    model = "virtio"
+    bridge = "vmbr2"
+    mtu = 9000
   }
   memory = 2096
   cores = 4
@@ -76,7 +87,7 @@ resource "proxmox_vm_qemu" "kube-worker" {
           emulatessd         = true
           iothread           = true
           replicate          = true
-          size               = 16
+          size               = 64
           storage            = "data"
         }
       }
@@ -86,6 +97,7 @@ resource "proxmox_vm_qemu" "kube-worker" {
   depends_on = [proxmox_vm_qemu.kube-master]
 
   provisioner "local-exec" {
-    command = "sleep 25 && export K3S_TOKEN=$(ssh root@${each.value.ssh_host} cat /var/lib/rancher/k3s/server/token) && export K3S_URL=https://${each.value.ssh_host}:6443 && pyinfra --ssh-user root ${self.ssh_host} ./provisioning/k3s_worker.py"
+    # TODO: this is a hack, we need to wait for the master to be up and running before we can provision the worker. Need to actively check for ssh port
+    command = "sleep 25 && export K3S_TOKEN=$(ssh root@${proxmox_vm_qemu.kube-master["pve-0"].ssh_host} cat /var/lib/rancher/k3s/server/token) && export K3S_URL=https://${proxmox_vm_qemu.kube-master["pve-0"].ssh_host}:6443 && pyinfra --ssh-user root ${self.ssh_host} ./provisioning/k3s_worker.py"
   }
 }
