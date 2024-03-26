@@ -28,7 +28,7 @@ resource "proxmox_vm_qemu" "kube-master" {
     bridge = "vmbr2"
     mtu = 9000
   }
-  memory = 2096
+  memory = 4096
   cores = 4
   os_type = "cloud-init"
   cloudinit_cdrom_storage = "data"
