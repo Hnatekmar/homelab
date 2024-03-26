@@ -32,6 +32,7 @@ def connect_to_nas():
         )
         server.shell(
             commands=[
+                "systemctl daemon-reload",
                 f"systemctl start nfs-{mount}.mount"
             ]
         )
