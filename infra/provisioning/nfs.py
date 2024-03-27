@@ -12,13 +12,11 @@ def connect_to_nas():
         # name="Install nfs utils",
         packages=["nfs-utils"],
     )
-    mounts = [
-        "work"
-    ]
+    mounts = ["work"]
     files.line(
         # name="Insert nas.hnatekmar.xyz to /etc/hosts",
         path="/etc/hosts",
-        line="192.168.88.10 nas.hnatekmar.xyz"
+        line="192.168.88.10 nas.hnatekmar.xyz",
     )
     files.directory(
         # name="Create /nfs",
@@ -28,17 +26,21 @@ def connect_to_nas():
         files.line(
             # name="Insert mount to /etc/fstab",
             path="/etc/fstab",
-            line="nas.hnatekmar.xyz:/" + mount + f"\t/nfs/{mount}\tnfs\tx-systemd.automount\t" + "0\t" + "0",
+            line="nas.hnatekmar.xyz:/"
+            + mount
+            + f"\t/nfs/{mount}\tnfs\tx-systemd.automount\t"
+            + "0\t"
+            + "0",
         )
         server.shell(
-            commands=[
-                "systemctl daemon-reload",
-                f"systemctl start nfs-{mount}.mount"
-            ]
+            commands=["systemctl daemon-reload", f"systemctl start nfs-{mount}.mount"]
         )
 
 
-python.call(
-    name="Generate /etc/fstab for nas",
-    function=connect_to_nas
-)
+def install_common_dependencies():
+    dnf.packages(packages=["fish", "nmap", "btop", "fzf", "ripgrep"])
+
+
+python.call(name="Generate /etc/fstab for nas", function=connect_to_nas)
+
+python.call(name="Install common dependencies", function=install_common_dependencies)

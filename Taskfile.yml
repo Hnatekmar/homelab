@@ -1,0 +1,18 @@
+---
+version: '3'
+
+
+tasks:
+    up:
+    # Creates infrastructure
+        dir: ./infra
+        dotenv: [.env]
+        cmds:
+            - terraform apply -auto-approve
+
+    down:
+    # Destroys infrastructure
+        dir: ./infra
+        dotenv: [.env]
+        cmds:
+            - terraform destroy -auto-approve
