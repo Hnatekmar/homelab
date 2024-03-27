@@ -1,7 +1,7 @@
-from pyinfra import local
-from pyinfra.operations import server, python
-
 import os
+
+from pyinfra import local
+from pyinfra.operations import server
 
 local.include("provisioning/utils.py")
 

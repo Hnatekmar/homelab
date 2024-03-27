@@ -1,6 +1,5 @@
-import pyinfra
 from pyinfra import local
-from pyinfra.operations import server, python, dnf
+from pyinfra.operations import server, dnf
 
 local.include("provisioning/utils.py")
 
