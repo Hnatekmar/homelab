@@ -37,10 +37,4 @@ def connect_to_nas():
         )
 
 
-def install_common_dependencies():
-    dnf.packages(packages=["fish", "nmap", "btop", "fzf", "ripgrep"])
-
-
 python.call(name="Generate /etc/fstab for nas", function=connect_to_nas)
-
-python.call(name="Install common dependencies", function=install_common_dependencies)

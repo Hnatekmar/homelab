@@ -45,7 +45,7 @@ resource "proxmox_vm_qemu" "kube-master" {
       ide0 {
         disk {
           size    = "20"
-          storage = "nas"
+          storage = "data"
         }
       }
     }
