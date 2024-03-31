@@ -7,7 +7,16 @@ def configure_shell_env():
     Configure shell environment
     """
     dnf.packages(
-        name="Install fish", packages=["fish", "nmap", "btop", "fzf", "ripgrep"]
+        name="Install fish",
+        packages=[
+            "fish",
+            "nmap",
+            "btop",
+            "fzf",
+            "ripgrep",
+            "dnf-plugins-core",
+            "qemu-guest-agent",
+        ],
     )
     server.shell(name="Set fish as default shell", commands=["chsh -s /usr/bin/fish"])
 
