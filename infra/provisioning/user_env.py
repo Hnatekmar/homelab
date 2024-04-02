@@ -14,7 +14,6 @@ def configure_shell_env():
             "btop",
             "fzf",
             "ripgrep",
-            "dnf-plugins-core",
             "qemu-guest-agent",
         ],
     )

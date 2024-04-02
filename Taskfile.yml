@@ -3,12 +3,33 @@ version: '3'
 
 
 tasks:
+    init:
+        # Initializes infra if needed
+        dir: ./infra
+        cmds:
+            - terraform init
     up:
     # Creates infrastructure
         dir: ./infra
         dotenv: [.env]
         cmds:
             - terraform apply -auto-approve
+            - task: regenerate_kubeconfig
+            - task: setup_flux
+        deps:
+            - init
+    regenerate_kubeconfig:
+        dir: ./infra
+        dotenv: [.env]
+        cmds:
+            - mkdir -p ~/.kube
+            - ssh -o 'StrictHostKeyChecking no' -o UserKnownHostsFile=/dev/null root@k3s-master cat /etc/rancher/k3s/k3s.yaml | sed "s/https:\/\/127.0.0.1:6443/https:\/\/k3s-master:6443/g" > ~/.kube/config
+
+    setup_flux:
+        dir: ./infra
+        dotenv: [.env]
+        cmds:
+            - flux bootstrap github --owner=${GITHUB_USER} --repository=${GITHUB_REPO} --branch=main --path=./clusters/${CLUSTER_NAME} --personal
 
     down:
     # Destroys infrastructure
