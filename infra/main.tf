@@ -13,8 +13,8 @@ terraform {
 }
 
 variable "proxmox_url" {
-    type = string
-    description = "Proxmox URL"
+  type = string
+  description = "Proxmox URL"
 }
 
 provider "proxmox" {
@@ -28,7 +28,17 @@ variable "tailscale_api_key" {
   description = "Tailscale API key"
 }
 
+variable "ssh_key" {
+  type = string
+  description = "SSH public key"
+  default = "~/.ssh/id_ed25519"
+}
+
 provider "tailscale" {
-    api_key = var.tailscale_api_key
-    tailnet = "-"
+  api_key = var.tailscale_api_key
+  tailnet = "-"
+}
+
+resource "tailscale_tailnet_key" "tailnet_key" {
+  reusable = true
 }
