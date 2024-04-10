@@ -47,7 +47,6 @@ module "kube-master" {
 }
 
 resource "dns_a_record_set" "kube-master-dns" {
-  # TODO: export ip address from module
   addresses = [module.kube-master.ip]
   zone      = "private.hnatekmar.xyz."
   name = "k3s-master"
