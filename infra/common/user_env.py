@@ -15,6 +15,7 @@ def configure_shell_env():
             "fzf",
             "ripgrep",
             "qemu-guest-agent",
+            "neovim"
         ],
     )
     server.shell(name="Set fish as default shell", commands=["chsh -s /usr/bin/fish"])

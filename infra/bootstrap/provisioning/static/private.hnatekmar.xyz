@@ -1,0 +1,13 @@
+$TTL 2d
+
+$ORIGIN private.hnatekmar.xyz.
+
+@	IN SOA	private.hnatekmar.xyz. root.localhost. (
+		0
+		12h
+		15m
+		3w
+		2h
+	)
+	IN NS	ns.private.hnatekmar.xyz.
+ns	IN A	172.16.100.30

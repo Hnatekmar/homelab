@@ -3,21 +3,23 @@ version: '3'
 
 
 tasks:
-    init:
-        # Initializes infra if needed
-        dir: ./infra
-        cmds:
-            - terraform init
     up:
     # Creates infrastructure
-        dir: ./infra
-        dotenv: [.env]
+        dir: ./infra/bootstrap
+        dotenv: [../.env]
         cmds:
+            - terraform init
             - terraform apply -auto-approve
-            - task: regenerate_kubeconfig
-            - task: setup_flux
-        deps:
-            - init
+            - ssh root@172.16.100.30 cat /etc/named.conf | grep secret | grep -o '".*"' | sed s/\"//g > /tmp/tsig-key
+            - task: kubernetes
+
+    kubernetes:
+        dir: ./infra/kubernetes
+        dotenv: [../.env]
+        cmds:
+            - terraform init
+            - terraform apply -auto-approve
+
     regenerate_kubeconfig:
         dir: ./infra
         dotenv: [.env]
@@ -33,7 +35,15 @@ tasks:
 
     down:
     # Destroys infrastructure
-        dir: ./infra
-        dotenv: [.env]
+        dir: ./infra/bootstrap
+        dotenv: [../.env]
+        cmds:
+            - terraform destroy -auto-approve
+            - task: down_kubernetes
+
+    down_kubernetes:
+        # Destroys infrastructure
+        dir: ./infra/kubernetes
+        dotenv: [../.env]
         cmds:
             - terraform destroy -auto-approve

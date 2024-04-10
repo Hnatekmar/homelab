@@ -63,10 +63,6 @@ variable "disk_size" {
   type        = number
   default     = 20
 }
-variable "tailscale_tailnet_key" {
-  description = "Tailscale key"
-  type        = string
-}
 
 variable "provisioning_script" {
   description = "Path to the provisioning script"
@@ -92,7 +88,7 @@ resource "proxmox_vm_qemu" "proxmox-vm" {
   memory                  = var.memory
   cores                   = var.cores
   os_type                 = "cloud-init"
-  cloudinit_cdrom_storage = "data"
+  cloudinit_cdrom_storage = "test"
   ciuser                  = "root"
   disks {
     ide {
@@ -100,7 +96,7 @@ resource "proxmox_vm_qemu" "proxmox-vm" {
       ide0 {
         disk {
           size    = var.disk_size
-          storage = "data"
+          storage = "test"
         }
       }
     }
@@ -108,7 +104,7 @@ resource "proxmox_vm_qemu" "proxmox-vm" {
 
   scsihw = "virtio-scsi-pci"
   provisioner "remote-exec" {
-    inline = ["tailscale up --authkey ${var.tailscale_tailnet_key}"]
+    inline = ["echo Test"]
     connection {
       type        = "ssh"
       user        = "root"
@@ -122,4 +118,9 @@ resource "proxmox_vm_qemu" "proxmox-vm" {
   provisioner "local-exec" {
     command = "ssh-keygen -R ${self.ssh_host} || true && pyinfra --ssh-user root ${self.ssh_host} ${var.provisioning_script}"
   }
+}
+
+
+output "ip" {
+  value = proxmox_vm_qemu.proxmox-vm.ssh_host
 }
