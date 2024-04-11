@@ -9,6 +9,13 @@ variable "worker_nodes" {
   type        = list(string)
   default     = ["pve-0", "pve-1", "pve-3"]
 }
+
+variable "gpu_worker_nodes" {
+  description = "List of proxmox nodes to deploy VMs on"
+  type        = list(string)
+  default     = ["gpve-0"]
+}
+
 variable "k3s_master_memory" {
   description = "Memory for the master node"
   default     = 2048
@@ -89,28 +96,39 @@ resource "dns_a_record_set" "kube-worker-dns" {
   name = "k3s-worker-${each.value}"
 }
 
-#
-#module "kube-worker" {
-#  providers = {
-#    proxmox = proxmox
-#  }
-#  source = "./vm"
-#  for_each = toset(var.worker_nodes)
-#  name        = "k3s-worker-${each.value}"
-#  node                  = each.value
-#  cores = 4
-#  tailscale_tailnet_key = ""
-#  provisioning_script = "./provisioning/k3s_worker.yaml"
-#  depends_on = [module.kube-master]
-#  networks = [
-#    {
-#      model = "virtio"
-#      bridge = "vmbr0"
-#    },
-#    {
-#      model = "virtio"
-#      bridge = "vmbr2"
-#      mtu = 9000
-#    }
-#  ]
-#}
+module "kube-worker-gpu" {
+  depends_on = [dns_a_record_set.kube-master-dns]
+  providers = {
+    proxmox = proxmox
+  }
+  template = "fedora-server-39-gpu"
+  for_each = toset(var.gpu_worker_nodes)
+  source = "./vm"
+  name = "k3s-worker-${each.value}.private.hnatekmar.xyz"
+  node = each.value
+  private_ssh_key = var.ssh_key
+  provisioning_script = "./provisioning/k3s_worker.yaml"
+  ipconfig0 = "ip=dhcp"
+  memory = 16192
+  disk_size = 32
+  cores = 4
+  networks = [
+    {
+      model = "virtio"
+      bridge = "vmbr0"
+    },
+    {
+      model = "virtio"
+      bridge = "vmbr2"
+      mtu = 9000
+    }
+  ]
+}
+
+resource "dns_a_record_set" "kube-worker-gpu-dns" {
+  depends_on = [module.kube-worker-gpu]
+  for_each = toset(var.gpu_worker_nodes)
+  addresses = [module.kube-worker-gpu[each.value].ip]
+  zone      = "private.hnatekmar.xyz."
+  name = "k3s-worker-${each.value}"
+}

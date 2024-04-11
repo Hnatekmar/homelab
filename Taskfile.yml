@@ -13,6 +13,7 @@ tasks:
             - ssh root@172.16.100.30 cat /etc/named.conf | grep secret | grep -o '".*"' | sed s/\"//g > /tmp/tsig-key
             - task: kubernetes
             - task: regenerate_kubeconfig
+            - task: setup_flux
 
     kubernetes:
         dir: ./infra/kubernetes

@@ -27,3 +27,5 @@
 - name: Disable selinux
   ansible.posix.selinux:
     state: disabled
+  # Can fail on containers
+  ignore_errors: yes
