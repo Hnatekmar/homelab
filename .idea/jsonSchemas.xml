@@ -3,6 +3,31 @@
   <component name="JsonSchemaMappingsProjectConfiguration">
     <state>
       <map>
+        <entry key="Ansible Playbook">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="Ansible Playbook" />
+              <option name="relativePathToSchema" value="https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook" />
+              <option name="applicationDefined" value="true" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="infra/bootstrap/provisioning/dns.yaml" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="infra/common/nfs.yaml" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="infra/common/user_env.yaml" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="infra/kubernetes/provisioning/k3s_master.yaml" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
         <entry key="Butane Config">
           <value>
             <SchemaInfo>
@@ -32,6 +57,9 @@
                 <list>
                   <Item>
                     <option name="path" value="taskfile.yml" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="Taskfile.yml" />
                   </Item>
                 </list>
               </option>

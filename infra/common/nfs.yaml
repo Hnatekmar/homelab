@@ -1,0 +1,10 @@
+---
+- name: Install nfs utils
+  yum:
+    name: nfs-utils
+    state: present
+
+- name: Insert nas.hnatekmar.xyz to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "192.168.88.10 nas.hnatekmar.xyz"

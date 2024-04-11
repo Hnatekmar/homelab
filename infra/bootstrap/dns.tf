@@ -40,6 +40,6 @@ resource "proxmox_lxc" "dns" {
   }
   start = true
   provisioner "local-exec" {
-    command = "ssh-keygen -R 172.16.100.30 || true && pyinfra --ssh-user root 172.16.100.30 ./provisioning/dns.py"
+    command = "ssh-keygen -R 172.16.100.30 || true && ansible-playbook -u root -i '172.16.100.30,' provisioning/dns.yaml"
   }
 }

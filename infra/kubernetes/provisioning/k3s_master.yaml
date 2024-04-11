@@ -1,0 +1,18 @@
+---
+- hosts: all
+  tasks:
+    - name: Include user_env
+      include_tasks: ../../common/user_env.yaml
+
+    - name: Include nfs
+      include_tasks: ../../common/nfs.yaml
+
+    - name: Install packages
+      yum:
+        name:
+          - rsync
+          - socat
+        state: present
+
+    - name: Install k3s
+      shell: curl -sfL https://get.k3s.io | sh -s - server --node-taint CriticalAddonsOnly=true:NoExecute --token k3s-testing

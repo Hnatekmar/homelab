@@ -113,10 +113,16 @@ resource "proxmox_vm_qemu" "proxmox-vm" {
       private_key = file(var.private_ssh_key)
     }
   }
+  # Specify dns server 172.16.100.30
+  nameserver = "172.16.100.30"
   ipconfig0 = var.ipconfig0
+  ipconfig1 = "ip=dhcp"
+
+  # Set q35
+  machine = "q35"
 
   provisioner "local-exec" {
-    command = "ssh-keygen -R ${self.ssh_host} || true && pyinfra --ssh-user root ${self.ssh_host} ${var.provisioning_script}"
+    command = "ssh-keygen -R ${self.ssh_host} || true && ansible-playbook -u root -i '${self.ssh_host},' ${var.provisioning_script}"
   }
 }
 

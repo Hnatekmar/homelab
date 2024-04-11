@@ -47,5 +47,5 @@ zone "0.in-addr.arpa" IN {
 zone "private.hnatekmar.xyz" {
 	type master;
 	file "/etc/bind/zones/private.hnatekmar.xyz";
-	allow-update { key tsig-key; };
+	allow-update { key tsig-key; 172.16.100.0/24; };
 };

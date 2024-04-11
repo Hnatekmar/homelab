@@ -1,0 +1,29 @@
+---
+- name: Install packages
+  yum:
+    name:
+      - fish
+      - nmap
+      - btop
+      - fzf
+      - ripgrep
+      - qemu-guest-agent
+      - neovim
+    state: present
+- name: Set fish as default shell
+  command: chsh -s /usr/bin/fish
+
+- name: Change /etc/systemd/resolved.conf
+  lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^DNS=.*'
+    line: 'DNS=172.16.100.30'
+
+- name: Restart systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: restarted
+
+- name: Disable selinux
+  ansible.posix.selinux:
+    state: disabled

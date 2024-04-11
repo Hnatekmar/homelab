@@ -33,7 +33,7 @@ variable "ssh_key" {
 provider "dns" {
   update {
     server        = "172.16.100.30"
-    key_name      = "private.hnatekmar.xyz."
+    key_name      = "tsig-key."
     key_algorithm = "hmac-sha256"
     key_secret    = file("/tmp/tsig-key")
   }

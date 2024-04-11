@@ -12,6 +12,7 @@ tasks:
             - terraform apply -auto-approve
             - ssh root@172.16.100.30 cat /etc/named.conf | grep secret | grep -o '".*"' | sed s/\"//g > /tmp/tsig-key
             - task: kubernetes
+            - task: regenerate_kubeconfig
 
     kubernetes:
         dir: ./infra/kubernetes
@@ -25,7 +26,7 @@ tasks:
         dotenv: [.env]
         cmds:
             - mkdir -p ~/.kube
-            - ssh -o 'StrictHostKeyChecking no' -o UserKnownHostsFile=/dev/null root@k3s-master cat /etc/rancher/k3s/k3s.yaml | sed "s/https:\/\/127.0.0.1:6443/https:\/\/k3s-master:6443/g" > ~/.kube/config
+            - ssh -o 'StrictHostKeyChecking no' -o UserKnownHostsFile=/dev/null root@k3s-master.private.hnatekmar.xyz cat /etc/rancher/k3s/k3s.yaml | sed "s/https:\/\/127.0.0.1:6443/https:\/\/k3s-master.private.hnatekmar.xyz:6443/g" > ~/.kube/config
 
     setup_flux:
         dir: ./infra
@@ -38,8 +39,8 @@ tasks:
         dir: ./infra/bootstrap
         dotenv: [../.env]
         cmds:
-            - terraform destroy -auto-approve
             - task: down_kubernetes
+            - terraform destroy -auto-approve
 
     down_kubernetes:
         # Destroys infrastructure

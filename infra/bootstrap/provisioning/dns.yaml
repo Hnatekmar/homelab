@@ -1,0 +1,49 @@
+---
+- hosts: all
+  tasks:
+    # Include user_env.yaml
+    - name: Install bind and bind-utils
+      yum:
+        name:
+          - bind
+          - bind-utils
+        state: present
+
+    - name: Transfer named.conf
+      copy:
+        src: static/named.conf
+        dest: /etc/named.conf
+
+    - name: Transfer named.rfc1912.zones
+      copy:
+        src: static/named.rfc1912.zones
+        dest: /etc/named.rfc1912.zones
+
+    - name: Ensure /etc/bind/zones exists
+      file:
+        path: /etc/bind/zones
+        state: directory
+
+    - name: Transfer private.hnatekmar.xyz
+      copy:
+        src: static/private.hnatekmar.xyz
+        dest: /etc/bind/zones/private.hnatekmar.xyz
+
+    - name: Chown /etc/bind/zones
+      file:
+        path: /etc/bind/zones
+        owner: named
+        group: named
+        state: directory
+        recurse: yes
+
+    - name: Generate rndc key
+      shell: tsig-keygen >> /etc/named.conf
+
+    - name: Ensure named service is running and enabled on boot
+      systemd:
+        name: named
+        state: started
+        enabled: yes
+
+    - include_tasks: ../../common/user_env.yaml

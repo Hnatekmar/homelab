@@ -27,10 +27,11 @@ module "kube-master" {
    proxmox = proxmox
  }
  source = "./vm"
- name = "k3s-master"
+ name = "k3s-master.private.hnatekmar.xyz"
  node = var.master_node
+ memory = var.k3s_master_memory
  private_ssh_key = var.ssh_key
- provisioning_script = "./provisioning/k3s_master.py"
+ provisioning_script = "./provisioning/k3s_master.yaml"
  ipconfig0 = "ip=dhcp"
  cores = 2
  networks = [
@@ -52,6 +53,42 @@ resource "dns_a_record_set" "kube-master-dns" {
   name = "k3s-master"
   depends_on = [module.kube-master]
 }
+
+module "kube-worker" {
+  depends_on = [dns_a_record_set.kube-master-dns]
+  providers = {
+    proxmox = proxmox
+  }
+  for_each = toset(var.worker_nodes)
+  source = "./vm"
+  name = "k3s-worker-${each.value}.private.hnatekmar.xyz"
+  node = each.value
+  private_ssh_key = var.ssh_key
+  provisioning_script = "./provisioning/k3s_worker.yaml"
+  ipconfig0 = "ip=dhcp"
+  memory = var.k3s_worker_memory
+  cores = 4
+  networks = [
+    {
+      model = "virtio"
+      bridge = "vmbr0"
+    },
+    {
+      model = "virtio"
+      bridge = "vmbr2"
+      mtu = 9000
+    }
+  ]
+}
+
+resource "dns_a_record_set" "kube-worker-dns" {
+  depends_on = [module.kube-worker]
+  for_each = toset(var.worker_nodes)
+  addresses = [module.kube-worker[each.value].ip]
+  zone      = "private.hnatekmar.xyz."
+  name = "k3s-worker-${each.value}"
+}
+
 #
 #module "kube-worker" {
 #  providers = {
@@ -63,7 +100,7 @@ resource "dns_a_record_set" "kube-master-dns" {
 #  node                  = each.value
 #  cores = 4
 #  tailscale_tailnet_key = ""
-#  provisioning_script = "./provisioning/k3s_worker.py"
+#  provisioning_script = "./provisioning/k3s_worker.yaml"
 #  depends_on = [module.kube-master]
 #  networks = [
 #    {
